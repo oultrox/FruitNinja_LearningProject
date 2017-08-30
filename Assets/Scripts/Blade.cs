@@ -47,6 +47,7 @@ public class Blade : MonoBehaviour {
             UpdateCut();
         }
 	}
+
     //Main method that calculates the velocity of our blades swipe movement
     private void UpdateCut()
     {
@@ -73,9 +74,9 @@ public class Blade : MonoBehaviour {
     //Starts the cutting instantating the blade.
     private void StartCutting()
     {
-        isCutting = true;
         //Always disabling the hitbox because update cut will check if we're slicing at the min speed.
         hitbox.enabled = false;
+        isCutting = true;
         currentBladeTrail = Instantiate(bladeTrailPrefab, transform);
         newPosition = cam.ScreenToWorldPoint(Input.mousePosition);
     }
@@ -83,8 +84,8 @@ public class Blade : MonoBehaviour {
     //stops the cutting disabling and destroyinh the blade.
     private void StopCutting()
     {
-        isCutting = false;
         hitbox.enabled = false;
+        isCutting = false;
         currentBladeTrail.transform.SetParent(null);
         Destroy(currentBladeTrail, 1f);
     }
