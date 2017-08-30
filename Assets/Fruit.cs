@@ -9,33 +9,30 @@ public class Fruit : MonoBehaviour {
     private Vector3 direction;
     private Quaternion rotation;
 
-
     [SerializeField] private float startForce = 15f;
-    private Rigidbody2D rb;
+    private Rigidbody2D rbody;
     private GameObject slicedFruit;
-    private Transform dynamicParent;
     private bool isSliced = false;
 
     //------API methods-----
     //Initialization
     void Start()
     {
-        rb = GetComponent<Rigidbody2D>();
-        rb.AddForce(transform.up * startForce,ForceMode2D.Impulse);
-        dynamicParent = GameObject.FindGameObjectWithTag("DynamicObject").transform;
-
+        rbody = GetComponent<Rigidbody2D>();
+        startForce = Random.Range(startForce - 3, startForce + 3);
+        rbody.AddForce(transform.up * startForce,ForceMode2D.Impulse);
     }
 
-    public void SliceFruit(Collider2D col)
+    public void SliceFruit(Collider2D col, Vector3 velocity, Transform dynamicObject)
     {
         if (!isSliced)
         {
             isSliced = true;
-            direction = (col.transform.position - transform.position).normalized;
+            direction = (velocity.magnitude != 0 ? velocity : (col.transform.position - transform.position).normalized);
             rotation = Quaternion.LookRotation(direction);
             rotation.y = 0.7f; //just for cosmetic purposes
             slicedFruit = Instantiate(fruitSlicedPrefab, transform.position, rotation);
-            slicedFruit.transform.SetParent(dynamicParent);
+            slicedFruit.transform.SetParent(dynamicObject);
             Destroy(gameObject);
             Destroy(slicedFruit, 3f);
         }

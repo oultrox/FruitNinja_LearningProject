@@ -7,27 +7,32 @@ using UnityEngine;
 public class Blade : MonoBehaviour {
 
     [SerializeField] GameObject bladeTrailPrefab;
-    [SerializeField] private float minCuttingVelocity = 0.015f;
+    [SerializeField] private float minCuttingVelocity = 1f;
+    [SerializeField] private float bladeSpeed = 80f;
 
+    private Vector3 velocity;
     private Vector2 previousPosition;
     private Vector2 newPosition;
-    
+
     private Rigidbody2D rbody;
     private CircleCollider2D hitbox;
 
     private Camera cam;
     private GameObject currentBladeTrail;
+    private Transform dynamicObject;
 
     private bool isCutting = false;
-    private float velocity;
+    private float distance;
+    private float speed;
 
     //-------API methods--------
     //Initialization
     private void Start()
     {
         rbody = this.GetComponent<Rigidbody2D>();
-        cam = Camera.main;
         hitbox = this.GetComponent<CircleCollider2D>();
+        dynamicObject = GameObject.FindGameObjectWithTag("DynamicObject").transform;
+        cam = Camera.main;
     }
 
     // Update is called once per frame
@@ -37,35 +42,49 @@ public class Blade : MonoBehaviour {
         {
             StartCutting();
         }
-        else if (Input.GetMouseButtonUp(0))
+        
+        if(Input.GetMouseButtonUp(0))
         {
             StopCutting();
         }
 
-        if (isCutting)
-        {
-            UpdateCut();
-        }
+        
+    }
+
+    private void FixedUpdate()
+    {
+        UpdateCut();
     }
 
     //Main method that calculates the velocity of our blades swipe movement
     private void UpdateCut()
     {
+        hitbox.enabled = false;
         newPosition = cam.ScreenToWorldPoint(Input.mousePosition);
-        rbody.position = newPosition;
         //Gets the velocity of our directional swipe.
-        velocity = (newPosition - previousPosition).magnitude / Time.deltaTime;
+        velocity = (newPosition - previousPosition);
+        distance = velocity.magnitude;
+        speed = distance / Time.deltaTime;
 
+        if (!isCutting)
+        {
+            rbody.position = newPosition;
+        }
+  
         //if it's higher than the minimal, enable the collider in order to cut.
-        if (velocity > minCuttingVelocity)
+        if (isCutting)
         {
-            hitbox.enabled = true;
+            rbody.position = Vector3.MoveTowards(rbody.position, newPosition, bladeSpeed * Time.deltaTime);
+            if (speed > minCuttingVelocity)
+            {
+                hitbox.enabled = true;
+            }
+            else
+            {
+                hitbox.enabled = false;
+            }
         }
-        else
-        {
-            hitbox.enabled = false;
-        }
-
+        
         //Updates the position
         previousPosition = newPosition;
     }
@@ -84,8 +103,8 @@ public class Blade : MonoBehaviour {
     private void StopCutting()
     {
         hitbox.enabled = false;
-        isCutting = false;
         currentBladeTrail.transform.SetParent(null);
+        isCutting = false;
         Destroy(currentBladeTrail, 1f);
     }
 
@@ -94,7 +113,126 @@ public class Blade : MonoBehaviour {
     {
         if (col.CompareTag("Fruit"))
         {
-            col.GetComponent<Fruit>().SliceFruit(hitbox);
+            col.GetComponent<Fruit>().SliceFruit(hitbox,this.velocity, dynamicObject);
         }
     }
+
+    #region Properties
+    public bool IsCutting
+    {
+        get
+        {
+            return isCutting;
+        }
+
+        set
+        {
+            isCutting = value;
+        }
+    }
+
+    public Vector3 Velocity
+    {
+        get
+        {
+            return velocity;
+        }
+
+        set
+        {
+            velocity = value;
+        }
+    }
+
+    public float MinCuttingVelocity
+    {
+        get
+        {
+            return minCuttingVelocity;
+        }
+
+        set
+        {
+            minCuttingVelocity = value;
+        }
+    }
+
+    public Vector2 PreviousPosition
+    {
+        get
+        {
+            return previousPosition;
+        }
+
+        set
+        {
+            previousPosition = value;
+        }
+    }
+
+    public Vector2 NewPosition
+    {
+        get
+        {
+            return newPosition;
+        }
+
+        set
+        {
+            newPosition = value;
+        }
+    }
+
+    public Rigidbody2D Rbody
+    {
+        get
+        {
+            return rbody;
+        }
+
+        set
+        {
+            rbody = value;
+        }
+    }
+
+    public CircleCollider2D Hitbox
+    {
+        get
+        {
+            return hitbox;
+        }
+
+        set
+        {
+            hitbox = value;
+        }
+    }
+
+    public Camera Cam
+    {
+        get
+        {
+            return cam;
+        }
+
+        set
+        {
+            cam = value;
+        }
+    }
+
+    public GameObject CurrentBladeTrail
+    {
+        get
+        {
+            return currentBladeTrail;
+        }
+
+        set
+        {
+            currentBladeTrail = value;
+        }
+    }
+    #endregion Properties
 }
