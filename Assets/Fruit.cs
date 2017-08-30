@@ -14,6 +14,7 @@ public class Fruit : MonoBehaviour {
     private Rigidbody2D rb;
     private GameObject slicedFruit;
     private Transform dynamicParent;
+    private bool isSliced = false;
 
     //------API methods-----
     //Initialization
@@ -25,19 +26,19 @@ public class Fruit : MonoBehaviour {
 
     }
 
-    //gets direction of the transform to the blade and calculates the angle.
-    private void OnTriggerEnter2D(Collider2D col)
+    public void SliceFruit(Collider2D col)
     {
-        if (col.CompareTag("Blade"))
+        if (!isSliced)
         {
-            
-            direction = (col.transform.position - transform.position).normalized; 
+            isSliced = true;
+            direction = (col.transform.position - transform.position).normalized;
             rotation = Quaternion.LookRotation(direction);
             rotation.y = 0.7f; //just for cosmetic purposes
-            slicedFruit = Instantiate(fruitSlicedPrefab,transform.position, rotation);
+            slicedFruit = Instantiate(fruitSlicedPrefab, transform.position, rotation);
             slicedFruit.transform.SetParent(dynamicParent);
             Destroy(gameObject);
             Destroy(slicedFruit, 3f);
         }
+        
     }
 }

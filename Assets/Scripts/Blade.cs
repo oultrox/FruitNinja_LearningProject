@@ -46,14 +46,13 @@ public class Blade : MonoBehaviour {
         {
             UpdateCut();
         }
-	}
+    }
 
     //Main method that calculates the velocity of our blades swipe movement
     private void UpdateCut()
     {
         newPosition = cam.ScreenToWorldPoint(Input.mousePosition);
         rbody.position = newPosition;
-
         //Gets the velocity of our directional swipe.
         velocity = (newPosition - previousPosition).magnitude / Time.deltaTime;
 
@@ -90,5 +89,12 @@ public class Blade : MonoBehaviour {
         Destroy(currentBladeTrail, 1f);
     }
 
-    
+    //if collides with fruit, cut it!
+    private void OnTriggerEnter2D(Collider2D col)
+    {
+        if (col.CompareTag("Fruit"))
+        {
+            col.GetComponent<Fruit>().SliceFruit(hitbox);
+        }
+    }
 }

@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class FruitSpawner : MonoBehaviour {
@@ -15,12 +14,14 @@ public class FruitSpawner : MonoBehaviour {
     private int fruitIndex;
     private Transform spawnPoint;
     private Transform dynamicParent;
+
     private void Start()
     {
         StartCoroutine(SpawnFruits());
         dynamicParent = GameObject.FindGameObjectWithTag("DynamicObject").transform;
     }
-    // Update is called once per frame
+
+    
     IEnumerator SpawnFruits () {
         while (true)
         {
